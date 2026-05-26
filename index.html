@@ -104,7 +104,7 @@
             50% { opacity: 0.5; transform: scale(1.02); }
         }
 
-        /* ĐỒNG HỒ ĐẾM NGƯỢC THÚC GIỤC */
+        /* ĐỒNG HỒ ĐẾM NGƯỢC NHỎ Ở TRÊN */
         .countdown-container {
             background: #fff3cd;
             border: 1px dashed #ffc107;
@@ -118,6 +118,44 @@
         #countdown {
             color: #d32f2f;
             font-size: 18px;
+        }
+
+        /* ĐỒNG HỒ ĐẾM NGƯỢC LỚN Ở TRONG FORM ĐẶT HÀNG */
+        .form-countdown {
+            background: #fff5f5;
+            border: 3px solid #d32f2f;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.15);
+            margin-bottom: 25px;
+            animation: borderBlink 1.5s infinite;
+        }
+
+        .countdown-title {
+            color: #d32f2f;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        #countdown-large {
+            font-size: 54px; /* Size chữ cực to */
+            font-weight: 900;
+            color: #d32f2f;
+            margin: 8px 0;
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-countdown p {
+            font-size: 14px;
+            color: #444;
+            font-weight: 600;
+        }
+
+        @keyframes borderBlink {
+            50% { border-color: #ff9800; }
         }
 
         /* KHU VỰC BẢNG GIÁ ĐẸP MẮT */
@@ -460,7 +498,14 @@
         </section>
 
         <section class="order-section" id="dat-hang">
-            <h2 class="section-title" style="margin-top:0;">Thông Tin Đặt Hàng</h2>
+            
+            <div class="form-countdown">
+                <div class="countdown-title"><i class="fa-solid fa-triangle-exclamation"></i> ƯU ĐÃI SẮP HẾT HẠN TRONG NGÀY VÀO TRANG!</div>
+                <div id="countdown-large">15:00</div>
+                <p>Sau khi hết thời gian, giá sản phẩm sẽ quay trở lại giá gốc <span style="text-decoration: line-through; color: #888;">399.000đ</span></p>
+            </div>
+
+            <h2 class="section-title" style="margin-top:20px;">Thông Tin Đặt Hàng</h2>
             <p style="text-align:center; font-size:14px; color:#666; margin-bottom:20px;">Vui lòng điền chính xác thông tin để nhận ưu đãi FREE SHIP ngày hôm nay!</p>
 
             <form id="orderForm">
@@ -505,31 +550,34 @@
     </footer>
 
     <script>
-        // Xử lý bộ đếm ngược thời gian (15 Phút)
-        function startTimer(duration, display) {
-            let timer = duration, minutes, seconds;
-            setInterval(function () {
-                minutes = parseInt(timer / 60, 10);
-                seconds = parseInt(timer % 60, 10);
-
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                display.textContent = minutes + ":" + seconds;
-
-                if (--timer < 0) {
-                    timer = duration;
-                }
-            }, 1000);
-        }
-
+        // Xử lý bộ đếm ngược thời gian đồng bộ cho cả đồng hồ nhỏ và đồng hồ to khổng lồ
         window.onload = function () {
             let fifteenMinutes = 60 * 15,
-                display = document.querySelector('#countdown');
-            startTimer(fifteenMinutes, display);
+                displaySmall = document.querySelector('#countdown'),
+                displayLarge = document.querySelector('#countdown-large');
+            
+            function startDoubleTimer(duration) {
+                let timer = duration, minutes, seconds;
+                setInterval(function () {
+                    minutes = parseInt(timer / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    if (displaySmall) displaySmall.textContent = minutes + ":" + seconds;
+                    if (displayLarge) displayLarge.textContent = minutes + ":" + seconds;
+
+                    if (--timer < 0) {
+                        timer = duration;
+                    }
+                }, 1000);
+            }
+            
+            startDoubleTimer(fifteenMinutes);
         };
 
-        // Gửi data về Google Sheets của bạn giữ nguyên cấu trúc chuẩn cũ
+        // Gửi dữ liệu đơn hàng về Google Sheets lưu lại liên kết chuẩn cũ
         document.getElementById('orderForm').addEventListener('submit', function(e){
             e.preventDefault();
 
